@@ -107,7 +107,7 @@
                 <option value="Coca Cola 1.25 lt">Coca Cola 1.25 lt</option>
                 <option value="Coca Cola 500 ml">Coca Cola 500 ml</option>
                 <option value="Cerveza 1.2 lt">Cerveza 1.2 lt</option>
-                <option value="Cerveza 1.2 lt">Cerveza 400 ml</option>
+                <option value="Cerveza 355 ml">Cerveza 355 ml</option>
             </select>
             <input type="number" id="cantidad" value="1" min="1">
             <button class="btn-add" onclick="nuevoRegistro()">Registrar</button>
@@ -139,7 +139,7 @@
 <script>
     let registros = JSON.parse(localStorage.getItem('envases_v12')) || [];
     let mostrarTodoHisto = false;
-    const TIPOS = ["Coca Cola 3 lt", "Coca Cola 1.25 lt", "Coca Cola 500 ml", "Cerveza 1.2 lt"];
+    const TIPOS = ["Coca Cola 3 lt", "Coca Cola 1.25 lt", "Coca Cola 500 ml", "Cerveza 1.2 lt", "Cerveza 355 ml"];
 
     window.onload = actualizarInterfaz;
 

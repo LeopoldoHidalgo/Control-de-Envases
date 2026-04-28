@@ -4,21 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Envases por Casa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
-            /* PALETA UNIFICADA */
-            --primary: #34495e;    /* Azul Grisáceo */
-            --success: #2ecc71;    /* Verde Esmeralda */
-            --warning: #f1c40f;    /* Amarillo/Dorado para advertencias */
-            --excel: #2980b9;      /* Azul Rey */
-            --bg: #2c3e50;         /* Fondo Gris Azulado Oscuro */
+            --primary: #34495e; 
+            --success: #2ecc71; 
+            --warning: #f1c40f; 
+            --excel: #2980b9; 
+            --bg: #2c3e50; 
             --text: #1e293b;
         }
+
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
         .container { max-width: 950px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .header h2 { color: white; margin: 0; } /* Ajuste de contraste para el título */
         
+        /* CABECERA CON ICONOS A LA MISMA ALTURA */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+        }
+        .header h2 { color: white; margin: 0; }
+
+        .top-tools {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+            padding: 5px;
+        }
+
+        .icon-btn:hover {
+            color: var(--success);
+            transform: scale(1.1);
+        }
+
         .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px; }
         .summary-card { background: white; padding: 15px; border-radius: 10px; border-left: 4px solid var(--excel); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .summary-card h4 { margin: 0; font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
@@ -29,7 +60,6 @@
         
         input, select, button { padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 15px; outline: none; }
         .btn-add { background: var(--success); color: white; border: none; font-weight: bold; cursor: pointer; }
-        .btn-excel { background: var(--excel); color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; }
         
         .search-bar { width: 100%; margin-bottom: 15px; box-sizing: border-box; }
         .btn-history { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; margin-bottom: 15px; font-weight: bold; width: auto; display: inline-block; }
@@ -50,6 +80,7 @@
             td { border: none; position: relative; padding-left: 45%; text-align: right; min-height: 35px; }
             td:before { content: attr(data-label); position: absolute; left: 10px; font-weight: bold; color: #94a3b8; font-size: 0.8rem; }
             .btn-history { width: 100%; }
+            .header { justify-content: center; }
         }
     </style>
 </head>
@@ -58,20 +89,25 @@
 <div class="container">
     <div class="header">
         <h2>🥤 Control de Envases</h2>
-        <button class="btn-excel" onclick="exportarExcel()">📊 Reporte Excel</button>
+        <div class="top-tools">
+            <button class="icon-btn" onclick="exportarCSV()" title="Exportar Respaldo"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+            <button class="icon-btn" onclick="document.getElementById('importCSV').click()" title="Importar Respaldo"><i class="fa-solid fa-gear"></i></button>
+            <input type="file" id="importCSV" style="display:none" accept=".csv" onchange="importarCSV(event)">
+        </div>
     </div>
 
     <div class="summary-grid" id="resumen"></div>
 
     <div class="card">
         <div class="form-grid">
-            <input type="text" id="casa" placeholder="Número de Casa (ej: 12)">
+            <input type="text" id="casa" placeholder="Número de Casa">
             <select id="envase">
                 <option value="">Selecciona envase...</option>
                 <option value="Coca Cola 3 lt">Coca Cola 3 lt</option>
                 <option value="Coca Cola 1.25 lt">Coca Cola 1.25 lt</option>
                 <option value="Coca Cola 500 ml">Coca Cola 500 ml</option>
                 <option value="Cerveza 1.2 lt">Cerveza 1.2 lt</option>
+                <option value="Cerveza 1.2 lt">Cerveza 400 ml</option>
             </select>
             <input type="number" id="cantidad" value="1" min="1">
             <button class="btn-add" onclick="nuevoRegistro()">Registrar</button>
@@ -111,26 +147,19 @@
         const casaInput = document.getElementById('casa');
         const envaseSelect = document.getElementById('envase');
         const cantidadInput = document.getElementById('cantidad');
-        
         let valorCasa = casaInput.value.trim();
-        const envase = envaseSelect.value;
-        const cant = parseInt(cantidadInput.value);
+        if(!valorCasa || !envaseSelect.value) return alert("Completa los datos");
 
-        if(!valorCasa || !envase) return alert("Completa la casa y el tipo de envase");
-
-        const ubicacionFinal = "Casa " + valorCasa;
-
-        const ahora = new Date();
         registros.unshift({
             id: Date.now(),
-            fecha: ahora.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' }),
-            ubicacion: ubicacionFinal, 
-            envase, 
-            cantidadInicial: cant, 
-            cantidadPendiente: cant, 
+            fecha: new Date().toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' }),
+            ubicacion: "Casa " + valorCasa, 
+            envase: envaseSelect.value, 
+            cantidadInicial: parseInt(cantidadInput.value), 
+            cantidadPendiente: parseInt(cantidadInput.value), 
             estado: 'PENDIENTE', 
             modificadoPor: 'Registro Inicial', 
-            ultimaMod: ahora.toLocaleString()
+            ultimaMod: new Date().toLocaleString()
         });
         
         guardar();
@@ -141,28 +170,19 @@
 
     function marcarDevolucion(id) {
         const reg = registros.find(r => r.id === id);
-        const nombreResponsable = prompt("Tu nombre:");
-        if (!nombreResponsable) return;
+        const nombre = prompt("Tu nombre:");
+        if (!nombre) return;
+        let dev = confirm(`¿Entrega completa?`) ? reg.cantidadPendiente : parseInt(prompt("¿Cuántos regresan?", reg.cantidadPendiente));
+        if (isNaN(dev) || dev <= 0 || dev > reg.cantidadPendiente) return;
 
-        let devueltos;
-        if(confirm(`¿Devuelve los ${reg.cantidadPendiente} envases completos?`)) {
-            devueltos = reg.cantidadPendiente;
-        } else {
-            devueltos = parseInt(prompt(`¿Cuántos regresan? (Pendientes: ${reg.cantidadPendiente})`, reg.cantidadPendiente));
-        }
-
-        if (isNaN(devueltos) || devueltos <= 0 || devueltos > reg.cantidadPendiente) return;
-
-        reg.cantidadPendiente -= devueltos;
+        reg.cantidadPendiente -= dev;
         reg.estado = reg.cantidadPendiente === 0 ? 'DEVUELTO' : 'PARCIAL';
-        reg.modificadoPor = nombreResponsable;
+        reg.modificadoPor = nombre;
         reg.ultimaMod = new Date().toLocaleString();
         guardar();
     }
 
     function eliminar(id) {
-        const nombreResponsable = prompt("Tu nombre para autorizar:");
-        if (!nombreResponsable) return;
         if(confirm("¿Eliminar registro?")) {
             registros = registros.filter(r => r.id !== id);
             guardar();
@@ -198,42 +218,58 @@
             if(r.estado === 'DEVUELTO') fila.style.opacity = "0.5";
 
             fila.innerHTML = `
-                <td data-label="Fecha Préstamo">${r.fecha}</td>
+                <td data-label="Fecha">${r.fecha}</td>
                 <td data-label="Ubicación"><strong>${r.ubicacion}</strong></td>
                 <td data-label="Envase">${r.envase}</td>
                 <td data-label="Cant.">${r.cantidadInicial}</td>
-                <td data-label="Faltan" style="font-weight:bold">${r.cantidadPendiente}</td>
+                <td data-label="Faltan"><strong>${r.cantidadPendiente}</strong></td>
                 <td data-label="Estado">
                     <span class="badge" style="color:${color}; border-color:${color}">${r.estado}</span>
-                    <div style="font-size:0.6rem; color:#64748b; margin-top:4px">${r.modificadoPor}</div>
                 </td>
                 <td data-label="Acción">
                     ${r.estado !== 'DEVUELTO' ? `<button class="btn-check" onclick="marcarDevolucion(${r.id})">Recibir</button>` : ''}
-                    <button class="btn-del" onclick="eliminar(${r.id})">Borrar</button>
+                    <button class="btn-del" onclick="eliminar(${r.id})">✕</button>
                 </td>
             `;
             lista.appendChild(fila);
         });
 
-        resumenDiv.innerHTML = TIPOS.map(t => {
-            const num = totales[t];
-            const textoStatus = num === 1 ? "prestado" : "prestados";
-            return `
+        resumenDiv.innerHTML = TIPOS.map(t => `
             <div class="summary-card">
                 <h4>${t}</h4>
-                <p style="color:${num > 0 ? 'var(--excel)' : '#cbd5e1'}">${num} <small>${textoStatus}</small></p>
+                <p style="color:${totales[t] > 0 ? 'var(--excel)' : '#cbd5e1'}">${totales[t]}</p>
             </div>
-            `;
-        }).join('');
+        `).join('');
     }
 
-    function exportarExcel() {
-        let csv = "\uFEFFFecha,Ubicacion,Envase,Inicial,Pendiente,Estado,Responsable,UltimaMod\n";
-        registros.forEach(r => csv += `"${r.fecha}","${r.ubicacion}","${r.envase}",${r.cantidadInicial},${r.cantidadPendiente},"${r.estado}","${r.modificadoPor}","${r.ultimaMod}"\n`);
+    function exportarCSV() {
+        let csv = "\uFEFFid,fecha,ubicacion,envase,cantidadInicial,cantidadPendiente,estado,modificadoPor,ultimaMod\n";
+        registros.forEach(r => csv += `${r.id},"${r.fecha}","${r.ubicacion}","${r.envase}",${r.cantidadInicial},${r.cantidadPendiente},"${r.estado}","${r.modificadoPor}","${r.ultimaMod}"\n`);
         const link = document.createElement("a");
         link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-        link.download = "Reporte_Envases_Casas.csv";
+        link.download = "Respaldo_Envases.csv";
         link.click();
+    }
+
+    function importarCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const lineas = e.target.result.split("\n");
+            let nuevos = [];
+            for(let i=1; i<lineas.length; i++) {
+                if(!lineas[i].trim()) continue;
+                const c = lineas[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                nuevos.push({
+                    id: parseInt(c[0]), fecha: c[1].replace(/"/g, ''), ubicacion: c[2].replace(/"/g, ''),
+                    envase: c[3].replace(/"/g, ''), cantidadInicial: parseInt(c[4]), cantidadPendiente: parseInt(c[5]),
+                    estado: c[6].replace(/"/g, ''), modificadoPor: c[7].replace(/"/g, ''), ultimaMod: c[8].replace(/"/g, '')
+                });
+            }
+            if(confirm("¿Importar registros?")) { registros = nuevos; guardar(); }
+        };
+        reader.readAsText(file);
     }
 </script>
 

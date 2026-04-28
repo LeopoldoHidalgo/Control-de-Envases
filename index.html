@@ -3,150 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Envases - Business Pro</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Control de Envases por Casa</title>
     <style>
-        /* --- UNIFICACIÓN DE PALETA --- */
         :root {
-            --color-fondo: #2c3e50;
-            --color-primario: #34495e;
-            --color-acento: #2ecc71;
-            --color-azul: #2980b9;
-            --blanco: #ffffff;
+            --primary: #e11d48; --success: #10b981; --warning: #f59e0b;
+            --excel: #1d4ed8; --bg: #f1f5f9; --text: #1e293b;
         }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+        .container { max-width: 950px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .summary-card { background: white; padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .summary-card h4 { margin: 0; font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
+        .summary-card p { margin: 5px 0 0; font-size: 1.4rem; font-weight: bold; }
 
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--color-fondo);
-            display: flex; justify-content: center; padding: 20px; margin: 0;
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+        
+        input, select, button { padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 15px; outline: none; }
+        .btn-add { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .btn-excel { background: var(--excel); color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; }
+        
+        .search-bar { width: 100%; margin-bottom: 15px; box-sizing: border-box; }
+        .btn-history { background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; margin-bottom: 15px; font-weight: bold; width: auto; display: inline-block; }
+        
+        .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
+        th { background: #f8fafc; font-size: 0.75rem; color: #64748b; }
+        
+        .badge { font-weight: bold; padding: 4px 8px; border-radius: 20px; font-size: 0.7rem; border: 1px solid; text-transform: uppercase; }
+        .btn-check { background: var(--success); color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+        .btn-del { background: #f1f5f9; color: #64748b; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+
+        @media (max-width: 700px) {
+            table, thead, tbody, th, td, tr { display: block; }
+            thead tr { position: absolute; top: -9999px; }
+            tr { border-bottom: 1px solid #e2e8f0; padding: 10px; }
+            td { border: none; position: relative; padding-left: 45%; text-align: right; min-height: 35px; }
+            td:before { content: attr(data-label); position: absolute; left: 10px; font-weight: bold; color: #94a3b8; font-size: 0.8rem; }
+            .btn-history { width: 100%; }
         }
-
-        .container {
-            width: 100%; max-width: 500px; background: var(--blanco); padding: 25px;
-            border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); color: #333;
-        }
-
-        /* BARRA SUPERIOR IGUAL A LA PRIMERA APP */
-        .top-bar {
-            display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 10px;
-        }
-
-        .icon-btn { 
-            background: none; border: none; font-size: 20px; 
-            color: #bdc3c7; cursor: pointer; transition: 0.3s;
-        }
-        .icon-btn:hover { color: var(--color-azul); transform: scale(1.1); }
-
-        h2 { text-align: center; color: var(--color-primario); margin-top: 0; font-weight: 800; }
-
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 12px; font-weight: bold; color: var(--color-azul); text-transform: uppercase; margin-bottom: 5px; }
-
-        input, select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 16px; box-sizing: border-box; outline: none; }
-        input:focus { border-color: var(--color-acento); }
-
-        .btn-registrar {
-            width: 100%; padding: 15px; background-color: var(--color-acento); color: white;
-            border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer;
-        }
-
-        .loan-card {
-            background: #f8f9fa; border-left: 5px solid var(--color-azul);
-            padding: 15px; border-radius: 10px; margin-top: 15px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .loan-qty { font-size: 1.2rem; font-weight: 900; color: var(--color-acento); }
-        .btn-devolver { background: #e74c3c; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="top-bar">
-        <button class="icon-btn" onclick="exportarDatos()" title="Exportar Historial"><i class="fa-solid fa-cloud-arrow-down"></i></button>
-        <button class="icon-btn" onclick="document.getElementById('importFile').click()" title="Importar Historial"><i class="fa-solid fa-gear"></i></button>
+    <div class="header">
+        <h2>🥤 Control de Envases</h2>
+        <button class="btn-excel" onclick="exportarExcel()">📊 Reporte Excel</button>
     </div>
-    <input type="file" id="importFile" style="display:none" accept=".json" onchange="importarDatos(event)">
 
-    <h2>🍼 Préstamo de Envases</h2>
+    <div class="summary-grid" id="resumen"></div>
+
+    <div class="card">
+        <div class="form-grid">
+            <input type="text" id="casa" placeholder="Número de Casa (ej: 12)">
+            <select id="envase">
+                <option value="">Selecciona envase...</option>
+                <option value="Coca Cola 3 lt">Coca Cola 3 lt</option>
+                <option value="Coca Cola 1.25 lt">Coca Cola 1.25 lt</option>
+                <option value="Coca Cola 500 ml">Coca Cola 500 ml</option>
+                <option value="Cerveza 1.2 lt">Cerveza 1.2 lt</option>
+            </select>
+            <input type="number" id="cantidad" value="1" min="1">
+            <button class="btn-add" onclick="nuevoRegistro()">Registrar</button>
+        </div>
+    </div>
+
+    <input type="text" id="buscador" class="search-bar" placeholder="Buscar por número de casa..." onkeyup="actualizarInterfaz()">
     
-    <div class="form-group">
-        <label>Cliente / Nombre:</label>
-        <input type="text" id="nombreCliente" placeholder="¿A quién le prestas?">
+    <button class="btn-history" id="toggleBtn" onclick="toggleHistorial()">Ver Historial de Devueltos</button>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha Préstamo</th>
+                    <th>Ubicación</th>
+                    <th>Envase</th>
+                    <th>Cant.</th>
+                    <th>Faltan</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="lista"></tbody>
+        </table>
     </div>
-
-    <div class="form-group">
-        <label>Cantidad:</label>
-        <input type="number" id="cantidadEnvase" value="1">
-    </div>
-
-    <div class="form-group">
-        <label>Tipo de Envase:</label>
-        <select id="tipoEnvase">
-            <option value="Refresco 2.5L">Refresco 2.5L</option>
-            <option value="Cerveza Mega">Cerveza Mega</option>
-            <option value="Garrafón">Garrafón</option>
-        </select>
-    </div>
-
-    <button class="btn-registrar" onclick="registrarPrestamo()">Registrar Préstamo</button>
-
-    <div id="listaPrestamos"></div>
 </div>
 
 <script>
-    let prestamos = JSON.parse(localStorage.getItem('prestamos_envases')) || [];
+    let registros = JSON.parse(localStorage.getItem('envases_v12')) || [];
+    let mostrarTodoHisto = false;
+    const TIPOS = ["Coca Cola 3 lt", "Coca Cola 1.25 lt", "Coca Cola 500 ml", "Cerveza 1.2 lt"];
 
-    function registrarPrestamo() {
-        const nombre = document.getElementById('nombreCliente').value;
-        const cant = document.getElementById('cantidadEnvase').value;
-        const tipo = document.getElementById('tipoEnvase').value;
-        if(!nombre) return alert("Escribe un nombre");
-        prestamos.push({ nombre, cant, tipo, fecha: new Date().toLocaleDateString() });
-        actualizarStorage();
-        limpiar();
+    window.onload = actualizarInterfaz;
+
+    function nuevoRegistro() {
+        const casaInput = document.getElementById('casa');
+        const envaseSelect = document.getElementById('envase');
+        const cantidadInput = document.getElementById('cantidad');
+        
+        let valorCasa = casaInput.value.trim();
+        const envase = envaseSelect.value;
+        const cant = parseInt(cantidadInput.value);
+
+        if(!valorCasa || !envase) return alert("Completa la casa y el tipo de envase");
+
+        // Anteponer "Casa " automáticamente
+        const ubicacionFinal = "Casa " + valorCasa;
+
+        const ahora = new Date();
+        registros.unshift({
+            id: Date.now(),
+            fecha: ahora.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' }),
+            ubicacion: ubicacionFinal, 
+            envase, 
+            cantidadInicial: cant, 
+            cantidadPendiente: cant, 
+            estado: 'PENDIENTE', 
+            modificadoPor: 'Registro Inicial', 
+            ultimaMod: ahora.toLocaleString()
+        });
+        
+        guardar();
+        casaInput.value = "";
+        envaseSelect.value = "";
+        cantidadInput.value = "1";
     }
 
-    function renderPrestamos() {
-        const div = document.getElementById('listaPrestamos');
-        div.innerHTML = prestamos.map((p, i) => `
-            <div class="loan-card">
-                <div><b>${p.nombre}</b><br><small>${p.tipo} - ${p.fecha}</small></div>
-                <div class="loan-qty">${p.cant}</div>
-                <button class="btn-devolver" onclick="devolver(${i})">✕</button>
+    function marcarDevolucion(id) {
+        const reg = registros.find(r => r.id === id);
+        const nombreResponsable = prompt("Tu nombre:");
+        if (!nombreResponsable) return;
+
+        let devueltos;
+        if(confirm(`¿Devuelve los ${reg.cantidadPendiente} envases completos?`)) {
+            devueltos = reg.cantidadPendiente;
+        } else {
+            devueltos = parseInt(prompt(`¿Cuántos regresan? (Pendientes: ${reg.cantidadPendiente})`, reg.cantidadPendiente));
+        }
+
+        if (isNaN(devueltos) || devueltos <= 0 || devueltos > reg.cantidadPendiente) return;
+
+        reg.cantidadPendiente -= devueltos;
+        reg.estado = reg.cantidadPendiente === 0 ? 'DEVUELTO' : 'PARCIAL';
+        reg.modificadoPor = nombreResponsable;
+        reg.ultimaMod = new Date().toLocaleString();
+        guardar();
+    }
+
+    function eliminar(id) {
+        const nombreResponsable = prompt("Tu nombre para autorizar:");
+        if (!nombreResponsable) return;
+        if(confirm("¿Eliminar registro?")) {
+            registros = registros.filter(r => r.id !== id);
+            guardar();
+        }
+    }
+
+    function toggleHistorial() {
+        mostrarTodoHisto = !mostrarTodoHisto;
+        document.getElementById('toggleBtn').innerText = mostrarTodoHisto ? "Ocultar Historial" : "Ver Historial de Devueltos";
+        actualizarInterfaz();
+    }
+
+    function guardar() {
+        localStorage.setItem('envases_v12', JSON.stringify(registros));
+        actualizarInterfaz();
+    }
+
+    function actualizarInterfaz() {
+        const lista = document.getElementById('lista');
+        const resumenDiv = document.getElementById('resumen');
+        const busqueda = document.getElementById('buscador').value.toLowerCase();
+        lista.innerHTML = "";
+        let totales = {};
+        TIPOS.forEach(t => totales[t] = 0);
+        
+        registros.forEach(r => {
+            totales[r.envase] += r.cantidadPendiente;
+            if (!mostrarTodoHisto && r.estado === 'DEVUELTO') return;
+            if (busqueda && !r.ubicacion.toLowerCase().includes(busqueda)) return;
+
+            const fila = document.createElement('tr');
+            let color = r.estado === 'PENDIENTE' ? 'var(--primary)' : (r.estado === 'PARCIAL' ? 'var(--warning)' : 'var(--success)');
+            if(r.estado === 'DEVUELTO') fila.style.opacity = "0.5";
+
+            fila.innerHTML = `
+                <td data-label="Fecha Préstamo">${r.fecha}</td>
+                <td data-label="Ubicación"><strong>${r.ubicacion}</strong></td>
+                <td data-label="Envase">${r.envase}</td>
+                <td data-label="Cant.">${r.cantidadInicial}</td>
+                <td data-label="Faltan" style="font-weight:bold">${r.cantidadPendiente}</td>
+                <td data-label="Estado">
+                    <span class="badge" style="color:${color}; border-color:${color}">${r.estado}</span>
+                    <div style="font-size:0.6rem; color:#64748b; margin-top:4px">${r.modificadoPor}</div>
+                </td>
+                <td data-label="Acción">
+                    ${r.estado !== 'DEVUELTO' ? `<button class="btn-check" onclick="marcarDevolucion(${r.id})">Recibir</button>` : ''}
+                    <button class="btn-del" onclick="eliminar(${r.id})">Borrar</button>
+                </td>
+            `;
+            lista.appendChild(fila);
+        });
+
+        resumenDiv.innerHTML = TIPOS.map(t => {
+            const num = totales[t];
+            const textoStatus = num === 1 ? "prestado" : "prestados";
+            return `
+            <div class="summary-card">
+                <h4>${t}</h4>
+                <p style="color:${num > 0 ? 'var(--primary)' : '#cbd5e1'}">${num} <small>${textoStatus}</small></p>
             </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
-    function devolver(i) { prestamos.splice(i, 1); actualizarStorage(); }
-    function actualizarStorage() { localStorage.setItem('prestamos_envases', JSON.stringify(prestamos)); renderPrestamos(); }
-    function limpiar() { document.getElementById('nombreCliente').value = ""; document.getElementById('nombreCliente').focus(); }
-
-    // FUNCIONES DE IMPORTAR / EXPORTAR (Formato JSON para no perder datos)
-    function exportarDatos() {
-        if(prestamos.length === 0) return alert("No hay datos para exportar");
-        const blob = new Blob([JSON.stringify(prestamos)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `Historial_Envases.json`;
-        a.click();
+    function exportarExcel() {
+        let csv = "\uFEFFFecha,Ubicacion,Envase,Inicial,Pendiente,Estado,Responsable,UltimaMod\n";
+        registros.forEach(r => csv += `"${r.fecha}","${r.ubicacion}","${r.envase}",${r.cantidadInicial},${r.cantidadPendiente},"${r.estado}","${r.modificadoPor}","${r.ultimaMod}"\n`);
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+        link.download = "Reporte_Envases_Casas.csv";
+        link.click();
     }
-
-    function importarDatos(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                prestamos = JSON.parse(e.target.result);
-                actualizarStorage();
-                alert("Historial importado correctamente");
-            } catch(err) { alert("Archivo no válido"); }
-        };
-        reader.readAsText(file);
-    }
-
-    renderPrestamos();
 </script>
+
 </body>
 </html>

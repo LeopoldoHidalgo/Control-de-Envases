@@ -6,15 +6,21 @@
     <title>Control de Envases por Casa</title>
     <style>
         :root {
-            --primary: #e11d48; --success: #10b981; --warning: #f59e0b;
-            --excel: #1d4ed8; --bg: #f1f5f9; --text: #1e293b;
+            /* PALETA UNIFICADA */
+            --primary: #34495e;    /* Azul Grisáceo */
+            --success: #2ecc71;    /* Verde Esmeralda */
+            --warning: #f1c40f;    /* Amarillo/Dorado para advertencias */
+            --excel: #2980b9;      /* Azul Rey */
+            --bg: #2c3e50;         /* Fondo Gris Azulado Oscuro */
+            --text: #1e293b;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
         .container { max-width: 950px; margin: 0 auto; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .header h2 { color: white; margin: 0; } /* Ajuste de contraste para el título */
         
         .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .summary-card { background: white; padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .summary-card { background: white; padding: 15px; border-radius: 10px; border-left: 4px solid var(--excel); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .summary-card h4 { margin: 0; font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
         .summary-card p { margin: 5px 0 0; font-size: 1.4rem; font-weight: bold; }
 
@@ -22,11 +28,11 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
         
         input, select, button { padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 15px; outline: none; }
-        .btn-add { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .btn-add { background: var(--success); color: white; border: none; font-weight: bold; cursor: pointer; }
         .btn-excel { background: var(--excel); color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 8px; font-weight: bold; }
         
         .search-bar { width: 100%; margin-bottom: 15px; box-sizing: border-box; }
-        .btn-history { background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; margin-bottom: 15px; font-weight: bold; width: auto; display: inline-block; }
+        .btn-history { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; margin-bottom: 15px; font-weight: bold; width: auto; display: inline-block; }
         
         .table-container { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; }
@@ -112,7 +118,6 @@
 
         if(!valorCasa || !envase) return alert("Completa la casa y el tipo de envase");
 
-        // Anteponer "Casa " automáticamente
         const ubicacionFinal = "Casa " + valorCasa;
 
         const ahora = new Date();
@@ -189,7 +194,7 @@
             if (busqueda && !r.ubicacion.toLowerCase().includes(busqueda)) return;
 
             const fila = document.createElement('tr');
-            let color = r.estado === 'PENDIENTE' ? 'var(--primary)' : (r.estado === 'PARCIAL' ? 'var(--warning)' : 'var(--success)');
+            let color = r.estado === 'PENDIENTE' ? '#e74c3c' : (r.estado === 'PARCIAL' ? 'var(--warning)' : 'var(--success)');
             if(r.estado === 'DEVUELTO') fila.style.opacity = "0.5";
 
             fila.innerHTML = `
@@ -216,7 +221,7 @@
             return `
             <div class="summary-card">
                 <h4>${t}</h4>
-                <p style="color:${num > 0 ? 'var(--primary)' : '#cbd5e1'}">${num} <small>${textoStatus}</small></p>
+                <p style="color:${num > 0 ? 'var(--excel)' : '#cbd5e1'}">${num} <small>${textoStatus}</small></p>
             </div>
             `;
         }).join('');
